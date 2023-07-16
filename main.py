@@ -5,7 +5,7 @@ print('Data loading...')
 df_hits = pd.read_csv('E:/Datasets/target_action_prediction_SberAvtopodpiska/ga_hits.csv', usecols = [
     'session_id', 'hit_number', 'hit_page_path', 'event_action'])
 df_sessions = pd.read_csv('E:/Datasets/target_action_prediction_SberAvtopodpiska/ga_sessions.csv', usecols = [
-    'session_id', 'client_id', 'visit_date', 'visit_time', 'visit_number', 'utm_source', 'utm_medium', 'utm_campaign',
+    'session_id', 'visit_date', 'visit_time', 'visit_number', 'utm_source', 'utm_medium', 'utm_campaign',
     'utm_adcontent', 'device_category', 'device_brand', 'device_screen_resolution', 'device_browser', 'geo_country',
     'geo_city'], low_memory=False)
 print('Data loaded')
@@ -16,8 +16,9 @@ df_sessions.utm_campaign.fillna('other', inplace=True)
 df_sessions.utm_adcontent.fillna('other', inplace=True)
 df_sessions.device_brand.fillna('other', inplace=True)
 
-# Merging of tables
+# Merging of tables and dropping of session_id
 df_full = df_hits.merge(right=df_sessions, on='session_id', how='inner', validate='m:1')
+df_full = df_full.drop('session_id', axis=1)
 
 # Constants belong to target actions
 TARGET_ACTIONS = ['sub_car_claim_click', 'sub_car_claim_submit_click', 'sub_open_dialog_click', 'sub_custom_question_submit_click',
