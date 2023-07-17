@@ -1,5 +1,29 @@
 import pandas as pd
 
+def get_brand_from_hit_page_path(src):
+    if '/cars/all/' in src:
+        index = src.find('/cars/all/')
+        cutted_str = src[index + 10 : ]
+        index = cutted_str.find('/')
+        brand = cutted_str[0 : index]
+    else:
+        brand = 'none'
+    return brand
+
+
+def get_model_from_hit_page_path(src):
+    if '/cars/all/' in src:
+        index = src.find('/cars/all/')
+        cutted_str = src[index + 10 : ]
+        index = cutted_str.find('/')
+        cutted_str = cutted_str[index + 1 : ]
+        index = cutted_str.find('/')
+        model = cutted_str[0 : index]
+    else:
+        model = 'none'
+    return model
+
+
 # Loading of data without features omitted on EDA stage
 print('Data loading...')
 df_hits = pd.read_csv('E:/Datasets/target_action_prediction_SberAvtopodpiska/ga_hits.csv', usecols = [
@@ -24,12 +48,19 @@ df_full = df_full.drop('session_id', axis=1)
 TARGET_ACTIONS = ['sub_car_claim_click', 'sub_car_claim_submit_click', 'sub_open_dialog_click', 'sub_custom_question_submit_click',
                   'sub_call_number_click', 'sub_callback_submit_click', 'sub_submit_success', 'sub_car_request_submit_click']
 
-# Transforming of target feature
+# Transforming of target feature 
 df_full.event_action = df_full.event_action.apply(lambda x: 1 if x in TARGET_ACTIONS else 0)
+a = df_full[df_full.hit_page_path.str.find('podpiska.sberauto.com/') != -1]
+df_full['brand'] = df_full.hit_page_path.apply(get_brand_from_hit_page_path)
+df_full['model'] = df_full.hit_page_path.apply(get_model_from_hit_page_path)
+df_full['hit_page_path'] = df_full['hit_page_path'].apply(lambda x: '' if '/cars/all/' in x else x)
+df_full['hit_page_path'] = df_full['hit_page_path'].apply(lambda x: '' if '/cars?' in x else x)
+df_full['hit_page_path'] = df_full['hit_page_path'].apply(lambda x: '' if 'podpiska.sberauto.com' in x else x)
+
 
 
 #a = df_full[df_full.session_id == '4024492994895054107.1640269084.1640269084']
-a = df_full[df_full.event_action == 1]
+a = df_full[df_full.hit_page_path != '']
 print(df_full.isna().any())
 
 
