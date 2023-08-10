@@ -1,4 +1,8 @@
 import pandas as pd
+from sklearn.preprocessing import TargetEncoder
+from sklearn.model_selection import cross_val_score
+from sklearn.neural_network import MLPClassifier
+
 
 # Loading of data without features omitted on EDA stage
 print('Data loading...')
@@ -28,5 +32,14 @@ df_sessions.device_brand.fillna('other', inplace=True)
 # Merging of tables and dropping of session_id
 df_full = df_hits_agg.merge(right=df_sessions, on='session_id', how='inner')
 df_full = df_full.drop('session_id', axis=1)
+print('Merging of tables performed')
 
-print(df_full.head())
+#TENC
+tenc = TargetEncoder(cv=7)
+x_enc = tenc.fit_transform(df_full.drop(columns=['event_action'], axis=1), df_full['event_action'])
+
+# Model training
+print('Model training...')
+scores = cross_val_score(MLPClassifier(random_state=0, hidden_layer_sizes=(100, 50)), x_enc, df_full['event_action'], cv=5, scoring='roc_auc') #0,6667
+print('Model trained')
+print(scores)
