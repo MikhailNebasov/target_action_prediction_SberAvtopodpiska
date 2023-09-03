@@ -55,7 +55,7 @@ categorical_features = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_adconte
 
 to_engineer_features = ColumnTransformer(transformers=[('categorical', categorical_transformer, categorical_features)])
 
-models = [LogisticRegression(random_state=0, solver='liblinear'), RandomForestClassifier(random_state=0, n_jobs=12),
+models = [LogisticRegression(random_state=0, solver='liblinear'), RandomForestClassifier(random_state=0, n_jobs=12, criterion='entropy'),
     MLPClassifier(random_state=0, hidden_layer_sizes=(100, 50))]
 
 preprocessor = Pipeline(steps=[('to_engineer_features', to_engineer_features),])
